@@ -1,0 +1,48 @@
+#pragma once
+
+#include <windows.h>
+#include <tlhelp32.h>
+#include <winternl.h>
+#include <stddef.h>
+#include <stdio.h>
+
+EXTERN_C BOOLEAN NTSYSAPI RtlEqualUnicodeString(PCUNICODE_STRING, PCUNICODE_STRING, BOOLEAN);
+EXTERN_C NTSTATUS NTAPI NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS, PVOID, ULONG, PULONG);
+EXTERN_C NTSTATUS NTAPI NtQueryInformationProcess(HANDLE, PROCESSINFOCLASS, PVOID, ULONG, PULONG);
+EXTERN_C NTSTATUS NTAPI NtReadVirtualMemory(HANDLE, PVOID, PVOID, ULONG, PULONG);
+EXTERN_C NTSTATUS NTAPI NtWriteVirtualMemory(HANDLE, PVOID, PVOID, ULONG, PULONG);
+EXTERN_C NTSTATUS NTAPI NtGetContextThread(HANDLE, PCONTEXT);
+EXTERN_C NTSTATUS NTAPI NtSetContextThread(HANDLE, PCONTEXT);
+EXTERN_C NTSTATUS NTAPI NtSuspendProcess(HANDLE);
+EXTERN_C NTSTATUS NTAPI NtResumeProcess(HANDLE);
+
+EXTERN_C NTSTATUS NTAPI NtUnmapViewOfSection(HANDLE, PVOID);
+
+EXTERN_C NTSTATUS NTAPI NtCreateSection(
+    HANDLE,
+    ACCESS_MASK,
+    POBJECT_ATTRIBUTES,
+    PLARGE_INTEGER,
+    ULONG,
+    ULONG,
+    HANDLE
+);
+
+EXTERN_C NTSTATUS NTAPI NtMapViewOfSection(
+    HANDLE,
+    HANDLE,
+    PVOID,
+    ULONG_PTR,
+    SIZE_T,
+    PLARGE_INTEGER,
+    PSIZE_T,
+    SECTION_INHERIT,
+    ULONG,
+    ULONG
+);
+
+DWORD GetNamedProcessId(LPCTSTR lpProcessName);
+HANDLE GetProccessHandle(LPCTSTR lpProcessName, DWORD *lpPid, DWORD dwDesiredAccess);
+HMODULE GetRemoteModuleHandle(HANDLE hProcess, LPCTSTR lpModuleName);
+FARPROC GetRemoteProcAddress(HANDLE hProcess, HMODULE hModule, LPCSTR lpProcName);
+LPVOID GetRemotePeb(HANDLE hProcess, PEB *lpPeb);
