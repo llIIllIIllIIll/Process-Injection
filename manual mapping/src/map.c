@@ -2,15 +2,6 @@
 
 typedef unsigned __int64 QWORD;
 
-#define RELOC_FLAG32(wRelInfo) ((wRelInfo >> 0xC) == IMAGE_REL_BASED_HIGHLOW)
-#define RELOC_FLAG64(wRelInfo) ((wRelInfo >> 0xC) == IMAGE_REL_BASED_DIR64)
-
-#ifdef _WIN64
-    #define RELOC_FLAG RELOC_FLAG64
-#else
-    #define RELOC_FLAG RELOC_FLAG32
-#endif
-
 typedef struct _IMAGE {
     BYTE *Data;
     DWORD Size;
@@ -73,7 +64,7 @@ static void Relocate(HANDLE hProcess, BYTE *lpRemoteAlloc, IMAGE *lpImage) {
         WORD *lpEntry = (WORD *)((BYTE *)lpBaseReloc + sizeof(IMAGE_BASE_RELOCATION));
 
         for (int i = 0; i < dwEntries; i++) {
-            if (RELOC_FLAG(*(lpEntry + i))) {
+            if ((*(lpEntry + i) >> 0xC) == IMAGE_REL_BASED_DIR64) {
                 DWORD dwEntryOffset = (*(lpEntry + i) & ~0xF000);
                 DWORD dwEntryRva = lpBaseReloc->VirtualAddress + dwEntryOffset;
                 BYTE *lpCorrectedVirtualAddress = lpRemoteAlloc + dwEntryRva;
